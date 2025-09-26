@@ -14,4 +14,22 @@ async function requireAuth(req, res, next) {
   }
 }
 
-module.exports = { requireAuth };
+const adminMiddleware = (req, res, next) => {
+console.log("user Data ===>>", req.user)
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Admin access required" });
+  }
+  next();
+};
+
+// Restrict to voter only
+const voterMiddleware = (req, res, next) => {
+  
+  if (req.user.role !== "voter") {
+    return res.status(403).json({ error: "Voter access required" });
+  }
+  next();
+};
+
+
+module.exports = { requireAuth, adminMiddleware, voterMiddleware };

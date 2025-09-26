@@ -43,15 +43,15 @@ UserRouter.post('/register', async (req, res) => {
     await user.save();
 
     // send email verification
-    const token = createEmailVerificationToken({ id: user._id, email: user.email });
-    const verifyLink = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
-    await sendMail({
-      to: user.email,
-      subject: 'Verify your email',
-      html: `<p>Hi ${user.name},</p>
-             <p>Click to verify your email: <a href="${verifyLink}">Verify Email</a></p>
-             <p>If link doesn't work, use token: ${token}</p>`,
-    });
+    // const token = createEmailVerificationToken({ id: user._id, email: user.email });
+    // const verifyLink = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
+    // await sendMail({
+    //   to: user.email,
+    //   subject: 'Verify your email',
+    //   html: `<p>Hi ${user.name},</p>
+    //          <p>Click to verify your email: <a href="${verifyLink}">Verify Email</a></p>
+    //          <p>If link doesn't work, use token: ${token}</p>`,
+    // });
 
     return res.status(201).json({ message: 'Registered. Check email for verification link.' });
   } catch (err) {
@@ -129,15 +129,15 @@ UserRouter.post('/login', async (req, res) => {
     // }
 
     // create tokens
-    const accessToken = createAccessToken({ id: user._id, email: user.email });
-    const refreshToken = createRefreshToken({ id: user._id, email: user.email });
+    const accessToken = createAccessToken({ id: user._id, email: user.email, role:user.role });
+    const refreshToken = createRefreshToken({ id: user._id, email: user.email , role:user.role});
 
     // store hashed refresh token in DB (simple store)
     user.refreshTokens.push({ token: refreshToken, createdAt: new Date() });
     await user.save();
 
     // return tokens (in prod, put refresh token in httpOnly cookie)
-    return res.json({ accessToken, refreshToken, user: { id: user._id, email: user.email, name: user.name } });
+    return res.json({ accessToken, refreshToken, user: { id: user._id, email: user.email, name: user.name, role:user.role } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
