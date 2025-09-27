@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true },
   passwordHash: { type: String, required: true },
   emailVerified: { type: Boolean, default: false },
-  role: { type: String, enum: ["voter", "admin"],},
+  role: { type: String, enum: ["voter", "admin"], default :"voter"},
   //profile data
   age: { type: Number },
   address: { type: String },

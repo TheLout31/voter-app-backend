@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const connectToDB = require("./config/mongodb.config");
 const UserRouter = require("./routes/auth.routes");
 const { loginLimiter } = require("./middlewares/ratelimiter");
@@ -9,6 +10,7 @@ const ElectionRouter = require("./routes/election.routes");
 
 const app = express();
 const PORT = 3000;
+app.use(cors());
 
 connectToDB();
 
