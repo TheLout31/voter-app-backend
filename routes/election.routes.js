@@ -1,6 +1,9 @@
 // routes/electionRoutes.js
-const express = require('express');
-const { adminMiddleware, requireAuth } = require("../middlewares/authentication.js");
+const express = require("express");
+const {
+  adminMiddleware,
+  requireAuth,
+} = require("../middlewares/authentication.js");
 const ElectionModel = require("../models/election.model.js");
 
 const ElectionRouter = express.Router();
@@ -19,8 +22,31 @@ ElectionRouter.post("/", requireAuth, adminMiddleware, async (req, res) => {
 // Get all active elections
 ElectionRouter.get("/", requireAuth, async (req, res) => {
   try {
-    const elections = await ElectionModel.find({ isActive: true });
+    const elections = await ElectionModel.find();
     res.json(elections);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ✅ Get single election by ID
+ElectionRouter.get("/:id", requireAuth, async (req, res) => {
+  try {
+    const election = await ElectionModel.findById(req.params.id);
+    if (!election) {
+      return res.status(404).json({ error: "Election not found" });
+    }
+
+    const now = new Date();
+    const isActiveNow = now >= election.startDate && now <= election.endDate;
+
+    // Update isActive if status changed
+    if (election.isActive !== isActiveNow) {
+      election.isActive = isActiveNow;
+      await election.save();
+    }
+
+    res.json(election);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -28,23 +54,28 @@ ElectionRouter.get("/", requireAuth, async (req, res) => {
 
 
 // routes/electionRoutes.js (add this)
-ElectionRouter.get("/:id/results", requireAuth, adminMiddleware, async (req, res) => {
-  try {
-    const election = await ElectionModel.findById(req.params.id);
-    if (!election) return res.status(404).json({ error: "Election not found" });
+ElectionRouter.get(
+  "/:id/results",
+  requireAuth,
+  adminMiddleware,
+  async (req, res) => {
+    try {
+      const election = await ElectionModel.findById(req.params.id);
+      if (!election)
+        return res.status(404).json({ error: "Election not found" });
 
-    res.json({
-      title: election.title,
-      candidates: election.candidates.map(c => ({
-        name: c.name,
-        party: c.party,
-        votes: c.votes
-      }))
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+      res.json({
+        title: election.title,
+        candidates: election.candidates.map((c) => ({
+          name: c.name,
+          party: c.party,
+          votes: c.votes,
+        })),
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
-
-module.exports = ElectionRouter
+module.exports = ElectionRouter;

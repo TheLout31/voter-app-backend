@@ -13,7 +13,7 @@ const electionSchema = new mongoose.Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   candidates: [candidateSchema],
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: false }
 }, { timestamps: true });
 
 const ElectionModel = mongoose.model("Election", electionSchema);

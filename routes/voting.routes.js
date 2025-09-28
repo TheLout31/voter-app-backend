@@ -18,8 +18,9 @@ VotingRouter.post(
     try {
       const { candidateId } = req.body;
       const { electionId } = req.params;
-      const userId = req.user._id;
-
+      const voterId = req.user._id;
+      console.log("res data ", res);
+      console.log("voterID", voterId);
       const election = await ElectionModel.findById(electionId);
       if (!election)
         return res.status(404).json({ error: "Election not found" });
@@ -29,8 +30,7 @@ VotingRouter.post(
         return res.status(400).json({ error: "Election not active" });
       }
 
-      const vote = new VoteModel({ voterId: userId, electionId, candidateId });
-      await vote.save();
+      const vote = await VoteModel.create({ voterId, electionId, candidateId });
 
       // Increment candidate’s votes count
       await ElectionModel.updateOne(
@@ -38,7 +38,7 @@ VotingRouter.post(
         { $inc: { "candidates.$.votes": 1 } }
       );
 
-      res.status(201).json({ message: "Vote cast successfully" });
+      res.status(201).json({ message: "Vote cast successfully", vote });
     } catch (error) {
       if (error.code === 11000) {
         return res
