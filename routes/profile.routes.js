@@ -27,28 +27,28 @@ ProfileRouter.post('/update', requireAuth, async (req, res) => {
 
 /**
  * Upload ID Document
- */
-ProfileRouter.post('/upload-id', requireAuth, upload.single('idDoc'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+//  */
+// ProfileRouter.post('/upload-id', requireAuth, upload.single('idDoc'), async (req, res) => {
+//   try {
+//     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const user = await userModel.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+//     const user = await userModel.findById(req.user.id);
+//     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    user.idDocument = {
-      fileName: req.file.filename,
-      fileUrl: `/uploads/${req.file.filename}`,
-      verified: false,
-      uploadedAt: new Date(),
-    };
+//     user.idDocument = {
+//       fileName: req.file.filename,
+//       fileUrl: `/uploads/${req.file.filename}`,
+//       verified: false,
+//       uploadedAt: new Date(),
+//     };
 
-    await user.save();
-    res.json({ message: 'Document uploaded, pending verification', doc: user.idDocument });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
+//     await user.save();
+//     res.json({ message: 'Document uploaded, pending verification', doc: user.idDocument });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
 
 /**
  * View profile
