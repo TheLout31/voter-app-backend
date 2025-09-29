@@ -55,7 +55,7 @@ ProfileRouter.post('/upload-id', requireAuth, upload.single('idDoc'), async (req
  */
 ProfileRouter.get('/me', requireAuth, async (req, res) => {
   try {
-    const user = await userModel.findById(req.user.id).select('-passwordHash -refreshTokens -mfa.secret');
+    const user = await userModel.findById(req.user._id).select('-passwordHash -refreshTokens -mfa.secret');
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
   } catch (err) {
