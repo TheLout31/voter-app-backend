@@ -20,7 +20,7 @@ ElectionRouter.post("/", requireAuth, adminMiddleware, async (req, res) => {
 });
 
 // Get all active elections
-ElectionRouter.get("/", requireAuth, async (req, res) => {
+ElectionRouter.get("/", async (req, res) => {
   try {
     const elections = await ElectionModel.find();
     res.json(elections);
