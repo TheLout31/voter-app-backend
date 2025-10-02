@@ -22,12 +22,22 @@ ElectionRouter.post("/", requireAuth, adminMiddleware, async (req, res) => {
 // Get all active elections
 ElectionRouter.get("/", async (req, res) => {
   try {
-    const elections = await ElectionModel.find();
+    const elections = await ElectionModel.find({ isActive: true });
+    const now = new Date();
+    const isActiveNow = now >= elections.endDate;
+
+    // Update isActive if status changed
+    if (isActiveNow == true) {
+      elections.isActive = false;
+      await elections.save();
+    }
     res.json(elections);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 // ✅ Get single election by ID
 ElectionRouter.get("/:id", requireAuth, async (req, res) => {
@@ -51,7 +61,6 @@ ElectionRouter.get("/:id", requireAuth, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 // routes/electionRoutes.js (add this)
 ElectionRouter.get(
